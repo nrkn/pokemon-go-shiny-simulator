@@ -1,8 +1,9 @@
 {
-  "name": "20190816-pokemon-go-shiny-simulator",
-  "version": "0.0.1",
+  "name": "pokemon-go-shiny-simulator",
+  "version": "0.0.2",
   "description": "How do different virtual people's luck compare if the RNG is \"fair\"?",
-  "main": "index.js",
+  "main": "/dist/index.js",
+  "typings": "/dist/index.d.js",
   "scripts": {
     "build": "tsc && browserify ./dist/index.js -o ./public/app.js"
   },
