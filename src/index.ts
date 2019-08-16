@@ -1,4 +1,4 @@
-const peopleEl = document.querySelector( '.people' )!
+const resultsEl = document.querySelector( '.results' )!
 const randomizeButtonEl = document.querySelector( 'button' )!
 const formEl = document.querySelector( 'form' )!
 const progressContainer = document.querySelector<HTMLDivElement>( '.progress' )!
@@ -42,16 +42,18 @@ const createSequenceProgress = <T>(
   next()
 }
 
-const createPerson = ( numEncounters: number, shinyRate: number ) => {
+const simulatePerson = ( numEncounters: number, shinyRate: number ) => {
   let shinies = 0
 
   for ( let i = 0; i < numEncounters; i++ ) {
+    // the number generated will be 0..shinyRate-1 - if it's zero, you got a
+    // shiny
     if ( !randInt( shinyRate ) ) {
       shinies++
     }
   }
 
-  return { shinies }
+  return shinies
 }
 
 const median = ( arr: number[] ) => {
@@ -65,6 +67,12 @@ const median = ( arr: number[] ) => {
   )
 }
 
+const average = ( arr: number[] ) => {
+  const sum = arr.reduce( ( a, b ) => a + b )
+
+  return sum / arr.length
+}
+
 const addPeopleToDom = () => {
   if( !formEl.checkValidity() ) return
 
@@ -74,85 +82,79 @@ const addPeopleToDom = () => {
   const numEncounters = Number( formData.get( 'numEncounters' ) )
   const shinyRate = Number( formData.get( 'shinyRate' ) )
 
-  peopleEl.innerHTML = '<h2>Results</h2>'
+  resultsEl.innerHTML = '<h2>Results</h2>'
+
+  const getRate = ( count: number, total = numEncounters ) => (
+    count === 0 ?
+      `0:${ total }` :
+      `1:${ Math.floor( total / count ) }`
+  )
 
   createSequenceProgress(
     numPeople,
-    () => createPerson( numEncounters, shinyRate ),
+    () => simulatePerson( numEncounters, shinyRate ),
     people => {
-      let totalEncounters = 0
-      let totalShinies = 0
       let worstCount = Number.MAX_SAFE_INTEGER
       let bestCount = Number.MIN_SAFE_INTEGER
       let zeroes = 0
 
-      let worstIndex = -1
-      let bestIndex = -1
-      let allRates = Array<number>( numPeople )
-
-      const peopleFragment = document.createDocumentFragment()
-
-      people.forEach( ( person, i ) => {
-        const { shinies } = person
-
-        allRates[ i ] = shinies === 0 ? 0 : Math.floor( numEncounters / shinies )
-
+      people.forEach( shinies => {
         if( shinies === 0 ) zeroes++
 
         if ( shinies > bestCount ) {
           bestCount = shinies
-          bestIndex = i
         }
 
         if ( shinies < worstCount ) {
           worstCount = shinies
-          worstIndex = i
         }
-
-        totalEncounters += numEncounters
-        totalShinies += shinies
       } )
 
-      const worst = people[ worstIndex ]
-      const best = people[ bestIndex ]
+      const medianShinies = median( people )
+      const averageShinies = average( people )
 
       const summaryP = document.createElement( 'p' )
 
-      const averageRate = Math.round( totalEncounters / totalShinies )
-
       summaryP.innerHTML = `
-        The difference between the best and worst luck was
-        <strong>${ best.shinies - worst.shinies }</strong> shiny
-        Pokémon
+        The difference between the best and worst luck was <strong>
+        ${ bestCount - worstCount }</strong> shiny Pokémon
+
         <br><br>
-        The person with the best luck got
-        <strong>${ best.shinies }</strong> shiny Pokémon. Their rate was
-        <strong>1:${ Math.floor( numEncounters / best.shinies ) }</strong>
+
+        The person with the best luck got <strong>${ bestCount }</strong> shiny
+        Pokémon and their rate was <strong>${ getRate( bestCount ) }</strong>
+
         <br><br>
-        The person with the worst luck got
-        <strong>${ worst.shinies }</strong> shiny Pokémon. Their rate was
-        <strong>${
-          worst.shinies === 0 ?
-          `0:${ numEncounters }` :
-          `1:${ Math.floor( numEncounters / worst.shinies ) }`
-        }</strong>
+
+        The person with the worst luck got <strong>${ worstCount }</strong>
+        shiny Pokémon and their rate was <strong>${ getRate( worstCount ) }
+        </strong>
+
         <br></br>
-        The average rate was <strong>1:${ averageRate }</strong>
+
+        The average number of shiny Pokémon was <strong>
+        ${ averageShinies.toFixed( 1 ) }</strong> and the average rate was
+        <strong>${ getRate( averageShinies ) }</strong>
+
         <br><br>
-        The median rate was <strong>1:${ median( allRates ) }</strong>
+
+        The median number of shiny Pokémon was <strong>
+        ${ medianShinies.toFixed( 1 ) }</strong> and the median rate was
+        <strong>${ getRate( medianShinies ) }</strong>
       `
 
       if( zeroes > 0 ){
         summaryP.innerHTML += `
           <br><br>
-          ${ zeroes } people got no shiny Pokémon. This is
-          1:${ Math.floor( numPeople / zeroes ) } people, or
-          ${ ( ( 100 / numPeople ) * zeroes ).toFixed( 2 ) }%
+
+          ${ zeroes } ${ zeroes === 1 ? 'person' : 'people' } got no shiny
+          Pokémon. This is <strong> ${ getRate( zeroes, numPeople ) }</strong>
+          people, or <strong>
+          ${ ( ( 100 / numPeople ) * zeroes ).toFixed( 1 ) }%</strong>
         `
       }
 
-      peopleEl.appendChild( summaryP )
-      peopleEl.appendChild( peopleFragment )
+      resultsEl.appendChild( summaryP )
     }
   )
 }
