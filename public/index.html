@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>Pokémon Go Shiny Simulator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    label span {
+      display: block;
+      font-weight: bold;
+    }
+
+    .progress {
+      background: rgba( 255, 255, 255, 0.5 );
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Pokémon Go Shiny Simulator</h1>
+  <p>
+    There is a lot of discussion about whether or not the random numbers that
+    determine if you get a shiny in Pokémon Go are fair, or if some accounts are
+    actually biased in a way that means that they get more shinies than others.
+    If you just compare yourself to your friends, it certainly seems like some
+    people get more than their share of luck!
+  </p>
+  <p>
+    The actual mechanics of Pokémon Go are unknown, but this simulation uses
+    fair random numbers, like rolling a dice, with no bias towards any
+    particular virtual "account" within the simulation.
+  </p>
+  <p>
+    The simulation shows that even with fair random numbers, there is more than
+    enough variance to explain why some of your friends' accounts seem to be
+    biased.
+  </p>
+  <p>
+    After building this and playing with it for a while, I believe that
+    rather than some of the theories about the random number generator being
+    seeded by your account ID or similar, it really is just luck.
+  </p>
+  <p>
+    The feeling that some people have "biased" accounts is caused by the small
+    sample size of how many people you personally know, and the relatively small
+    (typically tens of thousands) number of encounters any one player can have
+    had over the lifetime of the game so far.
+  </p>
+  <h2>Settings</h2>
+  <form>
+    <label>
+      <span>Number of People</span>
+      <input name="numPeople" type="number" value="10" min="2" max="100000" step="1">
+    </label>
+    <label>
+      <span>Number of Encounters</span>
+      <input name="numEncounters" type="number" value="50000" min="10" max="250000" step="1">
+    </label>
+    <label>
+      <span>Shiny Rate (1:n)</span>
+      <input name="shinyRate" type="number" value="400" min="10" max="450" step="1">
+    </label>
+    <button type="button">Simulate</button>
+  </form>
+  <h2>Results</h2>
+  <div class="people"></div>
+  <p>© 2019 Nik Coughlin - Github</p>
+  <div class="progress">
+    <progress></progress>
+  </div>
+  <script defer src="app.js"></script>
+</body>
+
+</html>
