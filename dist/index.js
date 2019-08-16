@@ -51,7 +51,7 @@ const addPeopleToDom = () => {
     const numPeople = Number(formData.get('numPeople'));
     const numEncounters = Number(formData.get('numEncounters'));
     const shinyRate = Number(formData.get('shinyRate'));
-    peopleEl.innerHTML = '';
+    peopleEl.innerHTML = '<h2>Results</h2>';
     createSequenceProgress(numPeople, () => createPerson(numEncounters, shinyRate), people => {
         let totalEncounters = 0;
         let totalShinies = 0;
